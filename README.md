@@ -9,7 +9,28 @@
 ## 1. システムアーキテクチャ・処理フロー
 
 本プロジェクトは、**「特徴量抽出・データセット生成」** と **「モデル学習・比較検証・可視化」** の2つのコンポーネントから構成されています。
-
+```text
+[question_list.xlsx] (生データ)
+       │
+       ▼ (Janome による形態素解析 / わかち書き)
+[TfidfVectorizer_Janome.py]
+       │
+       ├─► Excelへ書き戻し (わかち書きリスト・TF-IDFベクトル)
+       ▼
+[detaset.csv] (機械学習用データセット: 行=サンプル, 列=特徴量(単語))
+       │
+       ▼ (ホールドアウト分割 Train:Test = 75:25)
+[Compare_MachineLearning.py]
+       │
+       ├─► 1. 各種モデル(SVM, Gaussian NB, k-NN)の学習・評価
+       │      └─► classification_report 出力 (Precision, Recall, F1, Accuracy)
+       │
+       ├─► 2. k-NN ハイパーパラメータ $k$ の最適化検証
+       │      └─► 推移グラフのプロット (knn_result.png)
+       │
+       └─► 3. 主成分分析 (PCA) による2次元次元削減
+              └─► SVM決定境界 (Decision Boundary) とデータ分布の可視化 (PCA_result.png)
+```
 ---
 
 ## 2. ディレクトリ構成
@@ -66,3 +87,28 @@ python Compare_MachineLearning.py
 * k-Nearest Neighbors (k-NN): 近傍数 $k=16$ を初期値としたインスタンスベースモデル。
 4. k-NNハイパーパラメータ検証: 近傍数 $k$ を 1 から 99 まで走査させ、テストデータに対する Accuracy の推移を knn_result.png としてプロット保存します。これにより、過学習（Overfitting）と学習不足（Underfitting）の境界を可視化します。
 5. PCAによる特徴空間の可視化: 高次元なTF-IDF特徴量を、情報損失を最小限に抑えつつ主成分分析（PCA）を用いて2次元空間に射影（n_components=2）します。その後、2次元圧縮データ上でSVMモデルを再学習させ、matplotlib.pyplot.contourf を用いて決定境界（Decision Boundary）を描画し、テストサンプルの分布（散布図）と重ね合わせたグラフ PCA_result.png を生成します。
+
+## 参考文献
+(1) 岩村陸，岡田浩毅：「Watson によるチャットボットの学習方法」，CIEC 春季カンファレンス論文集，12，pp.136-137（2021）．
+(2) 岩村陸，岡田浩毅：「二つの文章に関する類似度スコア計算プログラムの比較検討」，CIEC 春季カンファレンス論文集，14，pp.76-77（2023）．
+(3) 小菅李音，高木正則，市川尚：「チャットボットと個別指導を併用した数学教育における理解困難箇所の学習支援の実践と評価」，情報教育シンポジウム論文集，2020，pp.31-38（2020）．
+(4) 渥美雅保，村田祐樹，安川葵：「オープンチャットとロボットの連係によるティーチングアシスタントとの協働システム」，人工知能学会全国大会論文集，31（2017）．
+(5) IBM：Watson Assistant，https://www.ibm.com/jp-ja/products/watson-assistant ，(2023年10月24日閲覧)．
+(6) 中山光樹：『機械学習・深層学習による自然言語処理入門 scikit-learnとTensorFlowを使った実践プログラミング』，pp.2-44，マイナビ出版（2020）．
+(7) 同上，pp.14-19．
+(8) Python Japan：https://www.python.jp/ ，(2023年10月24日閲覧)．
+(9) NumPy：https://numpy.org/ja/ ，(2023年10月24日閲覧)．
+(10) pandas：https://pandas.pydata.org/ ，(2023年10月24日閲覧)．
+(11) scikit-learn：https://scikit-learn.org/stable/ ，(2023年10月24日閲覧)．
+(12) 北研二，津田和彦，獅々堀正幹：『情報検索アルゴリズム』，pp.33-45，共立出版（2002）．
+(13) openpyxl：https://openpyxl.readthedocs.io/en/stable/ ，(2023年10月24日閲覧)．
+(14) Janome：https://mocobeta.github.io/janome/ ，(2023年10月24日閲覧)．
+(15) MathWorks：サポートベクターマシン (SVM)，https://jp.mathworks.com/discovery/support-vector-machine.html ，(2023年10月24日閲覧)．
+(16) 古宮嘉那子，伊藤裕佑，佐藤直人，小谷善行：「文書分類のための Negation Naive Bayes」，自然言語処理，20 (2)，pp.161-182（2013）．
+(17) IBM：k近傍法 (k-NN)，https://www.ibm.com/jp-ja/topics/knn ，(2023年10月24日閲覧)．
+(18) 環境省：https://www.renewable-energy-potential.env.go.jp/RenewableEnergy/dat/report/r03_01/r03_01_chpt3_Part2.pdf ，(2023年10月24日閲覧)．
+(19) 関栞，和喜多美月，杉本理：「Watson Assistant によるWeb 型チャットボットの開発 城西大学経営学部におけるチャットボットの実装について」，城西情報科学研究，pp.27-37，城西大学情報科学研究センター（2022）．
+(20) 山内一将，川本淳平，堀良彰，櫻井幸一：「機械学習を用いたセッション分類による C&C トラフィック抽出」，暗号と情報セキュリティシンポジウム，p.4C1-5（2014）．
+(21) 中山研一朗，正田備也：「機械学習を用いた分類モデルによる冗長な質問文の要点抽出」，第21回情報科学技術フォーラム（FIT2022）．
+(22) 東中竜一郎，稲葉通将，水上雅博：『Pythonでつくる対話システム』，オーム社（2020）．
+(23) 田中穂積：『自然言語処理 基礎と応用』，電子情報通信学会（1999）．
